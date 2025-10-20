@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: url-shortener-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+
+  api:
+    build:
+      context: .
+      dockerfile: Api/Dockerfile
+    container_name: url-shortener-api
+    restart: always
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Username=myuser;Password=mypassword;Database=mydatabase"
+      ASPNETCORE_URLS: http://+:8080
+    ports:
+      - "5000:8080"
+    depends_on:
+      - postgres
